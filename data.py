@@ -1,7 +1,7 @@
 import numpy as np
 import pandas as pd
 
-from sklearn.preprocessing import LabelEncoder, StandardScaler
+from sklearn.preprocessing import LabelEncoder, scale
 from sklearn.model_selection import StratifiedKFold
 
 
@@ -37,9 +37,7 @@ def preprocessing(encode_cat = "label",
     # Normalizing
     if normalize_num == "standard":
         for column in num_columns:
-            ss = StandardScaler()
-            ss.fit(train_df[column])
-            train_df[column] = ss.transform(train_df[column]).astype(float)
+            train_df[column] = scale(train_df[column]).astype(float)
 
     # Final sanity check for everything
     if encode_cat == "label":
