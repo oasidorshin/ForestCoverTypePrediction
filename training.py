@@ -17,7 +17,7 @@ def parse_args():
     parser.add_argument('--seed', default=42, type=int)
     parser.add_argument('--n_splits', default=5, type=int)
     parser.add_argument('--n_trials', default=20, type=int)
-    parser.add_argument('--modelname', default="svm", type=str)
+    parser.add_argument('--modelname', default="lgbm", type=str)
 
     return parser.parse_args()
 
@@ -34,7 +34,7 @@ if __name__ == "__main__":
     logging.info(f"STARTING TIME {foldername}")
     logging.info(f"ARGUMENTS {args} \n")
 
-    train_df, num_columns, cat_columns, target = preprocessing(normalize_num="standard")
+    train_df, num_columns, cat_columns, target = preprocessing()
 
     if args.modelname == "lgbm":
         train_lightgbm(train_df, num_columns, cat_columns, target, validation, foldername, args)
@@ -42,3 +42,8 @@ if __name__ == "__main__":
         train_catboost(train_df, num_columns, cat_columns, target, validation, foldername, args)
     elif args.modelname == "svm":
         train_svm(train_df, num_columns, target, validation, foldername, args)
+
+    if TELEGRAM_SEND:
+        import telegram_send
+
+        telegram_send.send(messages=[f"Script {__file__} is done"])

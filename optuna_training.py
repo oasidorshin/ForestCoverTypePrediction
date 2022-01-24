@@ -38,6 +38,7 @@ def train_lightgbm(train_df,
         trial_params = {'lambda_l1': trial.suggest_loguniform('lambda_l1', 1e-7, 100),
                         'lambda_l2': trial.suggest_loguniform('lambda_l2', 1e-7, 100),
                         'max_depth': trial.suggest_int('max_depth', 3, 12), # Can vary depending on data, -1 = unlimited
+                        'num_leaves': trial.suggest_int('num_leaves', 8, 4096, log = True),
                         'learning_rate': trial.suggest_loguniform('learning_rate', 0.001, 1),
                         'n_estimators': trial.suggest_int('n_estimators', 100, 5000, log = True), 
                         'min_child_samples': trial.suggest_int('min_child_samples', 10, 1000, log = True), # Can vary depending on data
@@ -142,7 +143,7 @@ def train_catboost(train_df,
                     'random_state': args.seed}
     
     def objective(trial):
-        trial_params = {'iterations': trial.suggest_int('iterations', 100, 2000, log = True),
+        trial_params = {'iterations': trial.suggest_int('iterations', 100, 5000, log = True),
                         'learning_rate': trial.suggest_loguniform('learning_rate', 0.001, 1),
                         'l2_leaf_reg': trial.suggest_loguniform('l2_leaf_reg', 1e-5, 100),
                         'depth': trial.suggest_int('depth', 3, 10), # Large depth = super slow
