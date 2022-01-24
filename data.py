@@ -4,6 +4,8 @@ import pandas as pd
 from sklearn.preprocessing import LabelEncoder, scale
 from sklearn.model_selection import StratifiedKFold
 
+from target_encoder import smoothing_target_encoder
+
 
 def preprocessing(encode_cat = "label",
                   normalize_num = None):
@@ -29,6 +31,20 @@ def preprocessing(encode_cat = "label",
             le = LabelEncoder()
             le.fit(train_df[column])
             train_df[column] = le.transform(train_df[column]).astype(int)
+    elif encode_cat == "target":
+        # Will need 1-hot encoded target if target is multiclass
+        onehot_target = pd.get_dummies(train_df[target])
+        onehot_target_columns = list(onehot_target.columns)
+        train_df[onehot_target_columns] = onehot_target
+
+        for column in cat_columns:
+            for target_column in onehot_target_columns:
+                new_column = f"{column}_{target_column}"
+                train_df[new_column] = smoothing_target_encoder(train_df, column, target_column, weight = 300)
+                num_columns.append(new_column)
+
+        train_df.drop(onehot_target_columns, axis = 1, inplace = True)
+        cat_columns = []
 
     # Convert num to float
     for column in num_columns:
